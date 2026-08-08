@@ -18,7 +18,6 @@ class GameSprite(sprite.Sprite):
         self.rect.x = player_x
         self.rect.y = player_y
 
-
     def reset(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
 
@@ -45,19 +44,49 @@ game = True
 FPS = 60
 clock = time.Clock()
 
+speed_x = 3
+speed_y = 3
+
+finish = False
+
+font.init()
+font = font.Font(None, 35)
+lose1 = font.render('Player 1 Lose!', True, (180, 0, 0))
+lose2 = font.render('Player 2 Lose!', True, (180, 0, 0))
+
 while game:
     for e in event.get():
         if e.type == QUIT:
             game = False
 
-    window.fill(background_color)
+    if finish != True:
 
-    player1.reset()
-    player2.reset()
-    ball.reset()
+        window.fill(background_color)
 
-    player1.update_l()
-    player2.update_r()
+        player1.reset()
+        player2.reset()
+        ball.reset()
 
-    display.update()
+        player1.update_l()
+        player2.update_r()
+
+        ball.rect.x += speed_x
+        ball.rect.y += speed_y
+
+        if ball.rect.y > height - 50 or ball.rect.y < 0:
+            speed_y *= -1
+
+        if sprite.collide_rect(player1, ball) or sprite.collide_rect(player2, ball):
+            speed_x *= -1
+            speed_y *= -1
+
+        if ball.rect.x < 0:
+            finish = True
+            window.blit(lose1, (200, 20000))
+
+        if ball.rect.x > width:
+                    finish = True
+                    window.blit(lose2, (200, 20000))
+
+        display.update()
     clock.tick(FPS)
